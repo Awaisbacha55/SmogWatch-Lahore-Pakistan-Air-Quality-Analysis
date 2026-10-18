@@ -1,0 +1,38 @@
+# Environment and Secrets (CRITICAL: NEVER COMMIT)
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Python Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# IDE and Editor Directories
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files and scratch pads
+*.tmp
+*.temp
+scratch/
