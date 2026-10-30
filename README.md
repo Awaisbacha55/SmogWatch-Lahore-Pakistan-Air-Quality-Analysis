@@ -3,10 +3,12 @@
 > ### 🌐 Live Published Project Links
 > - **Live Web Report (Published Online):** [https://awaisbacha55.github.io/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis/](https://awaisbacha55.github.io/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis/)
 > - **Live Interactive Plotly Dashboard:** [https://awaisbacha55.github.io/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis/figures/smogwatch_interactive_dashboard.html](https://awaisbacha55.github.io/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis/figures/smogwatch_interactive_dashboard.html)
+> - **Demo Walkthrough Video (YouTube):** [https://youtu.be/rJ_8j2bL8nc](https://youtu.be/rJ_8j2bL8nc)
 > - **Source Code Repository:** [https://github.com/Awaisbacha55/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis](https://github.com/Awaisbacha55/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis)
 
 [![Live Web Report](https://img.shields.io/badge/Live%20Report-GitHub%20Pages-blue.svg)](https://awaisbacha55.github.io/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis/)
 [![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Interactive%20Plotly-green.svg)](https://awaisbacha55.github.io/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis/figures/smogwatch_interactive_dashboard.html)
+[![Demo Video](https://img.shields.io/badge/YouTube-Walkthrough%20Video-red.svg)](https://youtu.be/rJ_8j2bL8nc)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Hourly Surveillance](https://img.shields.io/badge/Hourly%20Records-105%2C216%20Synchronized-purple.svg)](#diurnal-boundary-layer-dynamics)
@@ -301,7 +303,7 @@ Meteorological variables like low temperatures and calm winds do not *create* pa
 
 - 🌐 **Live Web Report (Published Online):** [https://awaisbacha55.github.io/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis/](https://awaisbacha55.github.io/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis/)
 - 📊 **Live Interactive Dashboard (Online):** [https://awaisbacha55.github.io/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis/figures/smogwatch_interactive_dashboard.html](https://awaisbacha55.github.io/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis/figures/smogwatch_interactive_dashboard.html)
-- 🎥 **Demo Walkthrough Video:** [https://www.youtube.com/watch?v=YOUR_VIDEO_ID](https://www.youtube.com/watch?v=YOUR_VIDEO_ID) *(Replace with your YouTube URL)*
+- 🎥 **Demo Walkthrough Video:** [https://youtu.be/rJ_8j2bL8nc](https://youtu.be/rJ_8j2bL8nc)
 - 💻 **Standalone GitHub Repository:** [https://github.com/Awaisbacha55/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis](https://github.com/Awaisbacha55/SmogWatch-Lahore-Pakistan-Air-Quality-Analysis)
 - 📑 **Comprehensive Data Story Report:** [`reports/smogwatch_week1_report.md`](reports/smogwatch_week1_report.md)
 - 📓 **Reproducible Exploratory Notebook:** [`notebooks/01_smogwatch_eda.ipynb`](notebooks/01_smogwatch_eda.ipynb) (100% pre-executed top-to-bottom with inline plots and zero external dependencies).
