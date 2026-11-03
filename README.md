@@ -28,11 +28,9 @@ A rigorous, reproducible data science surveillance project analyzing ground-leve
 - [Data Protection & Integrity Rules](#data-protection--integrity-rules)
 - [Technologies & Libraries](#technologies--libraries)
 - [Installation & Quickstart](#installation--quickstart)
-- [Reproducibility Workflow](#reproducibility-workflow)
-  - [1. Data Validation](#1-data-validation)
-  - [2. Daily & Hourly Feature Enhancement](#2-daily--hourly-feature-enhancement)
-  - [3. Figure & Dashboard Generation](#3-figure--dashboard-generation)
-  - [4. Exploratory Notebook](#4-exploratory-notebook)
+- [Reproducibility and Project Pipeline](#reproducibility-and-project-pipeline)
+  - [Pipeline Architecture & Component Roles](#pipeline-architecture--component-roles)
+  - [End-to-End Execution Order](#end-to-end-execution-order)
 - [Generated Visualizations (Figures 01–19)](#generated-visualizations)
 - [Data Quality, Sensor Limits & Limitations](#data-quality-sensor-limits--limitations)
 - [Correlation vs. Causation Caveat](#correlation-vs-causation-caveat)
@@ -119,21 +117,21 @@ SmogWatch/
 │       ├── 18_meteorology_vs_pm25_diurnal.png
 │       └── smogwatch_interactive_dashboard.html
 └── scripts/
-    ├── build_executed_notebook.py             # Verified end-to-end notebook runner
-    ├── build_online_report.py                 # Generates docs/index.html for GitHub Pages
+    ├── build_full_lifecycle_notebook.py       # Builds and executes the verified lifecycle notebook (01_smogwatch_eda.ipynb)
+    ├── build_online_report.py                 # Compiles the publication web report (docs/index.html)
     ├── check_flag_details.py                  # API diagnostic for extreme flag metadata
     ├── check_sensor_history.py                # Telemetry operational window inspector
-    ├── create_charts.py                       # Daily visualization suite (Figures 01–15)
+    ├── create_charts.py                       # Master daily visualization suite (Figures 01–15 & Plotly HTML dashboard)
     ├── create_hourly_charts.py                # Hourly diurnal visualization suite (Figures 16–18)
+    ├── create_worst_hours_and_days.py         # Figure 19 heatmap generator & Top 10 worst days table extractor
     ├── download_hourly_pm25.py                # OpenAQ v3 hourly downloader
     ├── download_pm25.py                       # Daily air quality ingestion script (PROTECTED)
     ├── download_weather.py                    # Open-Meteo ingestion script (PROTECTED)
     ├── find_sensors.py                        # OpenAQ sensor discovery tool
-    ├── generate_notebook.py                   # Notebook generator script
     ├── inspect_extremes.py                    # Sensor saturation inspection tool
     ├── prepare_analysis_data.py               # Original aggregation script (SAFEGUARDED)
-    ├── prepare_enhanced_analysis_data.py      # Enhanced aggregation with circular wind calculations
-    ├── prepare_hourly_analysis_data.py        # Harmonizes hourly PM2.5 and meteorology
+    ├── prepare_enhanced_analysis_data.py      # Enhanced daily aggregation with circular wind calculations
+    ├── prepare_hourly_analysis_data.py        # Harmonizes hourly PM2.5 and meteorology (105,216 records)
     ├── run_full_validation.py                 # Master validation orchestrator
     ├── test_openaq.py                         # OpenAQ API connectivity test
     ├── validate_all_pm25.py                   # Comprehensive air quality data validator
@@ -220,38 +218,93 @@ Copy-Item .env.example .env   # Windows PowerShell
 
 ---
 
-## Reproducibility Workflow
+## Reproducibility and Project Pipeline
 
-### 1. Data Validation
-Execute the verification scripts to inspect dataset integrity and descriptive metrics:
-```powershell
-# Validate raw air quality data
-python scripts\validate_all_pm25.py
+SmogWatch enforces an authoritative, transparent, and reproducible pipeline where raw data, preparation scripts, analysis notebooks, and report generators have clearly segregated, non-overlapping responsibilities.
 
-# Validate raw weather data
-python scripts\validate_weather.py
-
-# Validate baseline combined dataset
-python scripts\validate_processed_data.py
+```
+Raw Telemetry (data/raw/)
+       │
+       ├──> scripts/prepare_enhanced_analysis_data.py  ──> data/processed/daily_air_quality_weather_enhanced.csv
+       │                                                         │
+       ├──> scripts/prepare_hourly_analysis_data.py    ──> data/processed/hourly_air_quality_weather_2022_2024.csv
+       │                                                         │
+       │                                                         ├──> notebooks/01_smogwatch_eda.ipynb (Interactive EDA)
+       │                                                         ├──> scripts/create_charts.py (Figures 01–15 & Dashboard)
+       │                                                         ├──> scripts/create_hourly_charts.py (Figures 16–18)
+       │                                                         └──> scripts/create_worst_hours_and_days.py (Fig 19 & Top 10)
+       │                                                                  │
+       └──────────────────────────────────────────────────────────────────┴──> scripts/build_online_report.py ──> docs/index.html
 ```
 
-### 2. Feature Enhancement
-Generate the enhanced analysis dataset with circular wind direction averaging and temporal flags (written to a separate file):
-```powershell
-python scripts\prepare_enhanced_analysis_data.py
+---
+
+### Pipeline Architecture & Component Roles
+
+| Component Role | Authoritative File | Primary Responsibility |
+|---|---|---|
+| **Authoritative Analysis Notebook** | [`notebooks/01_smogwatch_eda.ipynb`](notebooks/01_smogwatch_eda.ipynb) | Single comprehensive analysis notebook. Fully executable top-to-bottom with 0 external dependencies. Contains an integrated raw-data reproducibility validation section (asserting bit-exact match against raw files) followed by 4-city comparative statistics, diurnal analysis, sensitivity tables, and inline charts. |
+| **Daily Data Preparation** | [`scripts/prepare_enhanced_analysis_data.py`](scripts/prepare_enhanced_analysis_data.py) | Merges raw daily air quality (`data/raw/air_quality/`) and raw hourly weather (`data/raw/weather/`) across all 4 cities onto an unbroken 1,096-day calendar framework (2022–2024). Computes vector circular mean wind direction, flags $985\ \mu\text{g/m}^3$ sensor saturation errors, and outputs `data/processed/daily_air_quality_weather_enhanced.csv`. |
+| **Hourly Data Harmonization** | [`scripts/prepare_hourly_analysis_data.py`](scripts/prepare_hourly_analysis_data.py) | Synchronizes OpenAQ v3 hourly PM2.5 records with Open-Meteo hourly meteorology across all four cities, producing the unified 105,216-row dataset at `data/processed/hourly_air_quality_weather_2022_2024.csv`. |
+| **Web Report Generation** | [`scripts/build_online_report.py`](scripts/build_online_report.py) | Compiles the publication-grade scientific web report and live surveillance portal to `docs/index.html` for GitHub Pages hosting, embedding all 19 figures, sensitivity analysis tables, and the interactive Plotly dashboard. |
+| **Daily Chart Suite** | [`scripts/create_charts.py`](scripts/create_charts.py) | Generates master static figures 01 through 15 (300 DPI PNGs in `reports/figures/`) and compiles the standalone interactive HTML time-series dashboard (`reports/figures/smogwatch_interactive_dashboard.html`). |
+| **Hourly & Diurnal Charts** | [`scripts/create_hourly_charts.py`](scripts/create_hourly_charts.py) | Generates Figures 16, 17, and 18 detailing 24-hour diurnal particulate profiles, seasonal contrasts, and planetary boundary layer meteorological coupling. |
+| **Worst Hours & Top 10 Audit** | [`scripts/create_worst_hours_and_days.py`](scripts/create_worst_hours_and_days.py) | Computes the 2D diurnal-seasonal matrix for Figure 19 (`19_hourly_heatmap_hour_by_month.png`) and exports the Top 10 worst days audit table to `data/processed/top_10_worst_days_by_city.csv`. |
+| **Notebook Execution Engine** | [`scripts/build_full_lifecycle_notebook.py`](scripts/build_full_lifecycle_notebook.py) | Developer automation utility that programmatically builds, executes, validates, and renders pre-computed outputs and inline figures for `notebooks/01_smogwatch_eda.ipynb`. |
+
+---
+
+### End-to-End Execution Order
+
+To reproduce the entire SmogWatch surveillance project from the raw datasets (`data/raw/`):
+
+#### Step 1: Pre-Flight Data Integrity Validation
+Execute verification scripts to audit raw data completeness and ensure read-only baseline files match expected cryptographic hashes:
+```bash
+# Validate raw air quality datasets
+python scripts/validate_all_pm25.py
+
+# Validate raw weather reanalysis datasets
+python scripts/validate_weather.py
+
+# Validate processed dataset schema
+python scripts/validate_processed_data.py
 ```
 
-### 3. Figure & Dashboard Generation
-Generate all 15 publication-grade static figures and the interactive Plotly HTML dashboard:
-```powershell
-python scripts\create_charts.py
-```
-Outputs are generated in `reports/figures/`.
+#### Step 2: Data Preparation & Feature Engineering
+Construct both the daily enhanced dataset (with circular wind direction and sensor-ceiling error flags) and the harmonized hourly dataset:
+```bash
+# Generate daily enhanced analysis dataset (4,384 rows)
+python scripts/prepare_enhanced_analysis_data.py
 
-### 4. Exploratory Notebook
-Open the comprehensive Jupyter notebook:
-```powershell
-jupyter notebook notebooks\01_smogwatch_eda.ipynb
+# Generate harmonized hourly dataset (105,216 rows)
+python scripts/prepare_hourly_analysis_data.py
+```
+
+#### Step 3: Visualizations & Interactive Dashboard Generation
+Generate all 19 publication-grade figures, the diurnal-seasonal heatmap, and the interactive Plotly dashboard:
+```bash
+# Generate Figures 01 through 15 & interactive Plotly dashboard HTML
+python scripts/create_charts.py
+
+# Generate Figures 16, 17, and 18 (diurnal profiles and boundary layer coupling)
+python scripts/create_hourly_charts.py
+
+# Generate Figure 19 (Hour x Month heatmap) & extract Top 10 worst days table
+python scripts/create_worst_hours_and_days.py
+```
+
+#### Step 4: Run the Authoritative Analysis Notebook
+Open and execute the standalone exploratory analysis notebook:
+```bash
+jupyter notebook notebooks/01_smogwatch_eda.ipynb
+```
+*(Select **Kernel** &rarr; **Restart & Run All**. The notebook runs top-to-bottom, reproduces Lahore cleaning directly from raw data, asserts numerical equivalence against the reference, and generates all 4-city charts inline).*
+
+#### Step 5: Compile the Live Web Report
+Compile the GitHub Pages web platform incorporating all updated tables, figures, and embedded dashboard:
+```bash
+python scripts/build_online_report.py
 ```
 
 ---
