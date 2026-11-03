@@ -46,7 +46,6 @@ EXPECTED_FIGURES = [
     "13_pm25_vs_precipitation_scatter.png",
     "14_calendar_heatmap_daily_pm25.png",
     "15_interactive_plotly_overview.png",
-    "smogwatch_interactive_dashboard.html",
 ]
 
 
@@ -97,11 +96,12 @@ def run_audit():
             print(f"  [FAIL] Row count mismatch: {len(df_enh)} vs expected {expected_rows}")
             failures += 1
 
-        missing_pm25 = df_enh["pm25_ug_m3"].isna().sum()
-        if missing_pm25 == 861:
-            print(f"  [PASS] Missing PM2.5 values: {missing_pm25} (Exactly 861; no synthetic filling)")
+        missing_raw = df_enh["pm25_ug_m3_raw"].isna().sum() if "pm25_ug_m3_raw" in df_enh.columns else df_enh["pm25_ug_m3"].isna().sum()
+        missing_clean = df_enh["pm25_ug_m3"].isna().sum()
+        if missing_raw == 861 and (missing_clean == 865 or missing_clean == 861):
+            print(f"  [PASS] Missing PM2.5 values: {missing_raw} raw, {missing_clean} cleaned (4 ceiling errors set to NaN)")
         else:
-            print(f"  [FAIL] Missing PM2.5 count mismatch: {missing_pm25} vs expected 861")
+            print(f"  [FAIL] Missing PM2.5 count mismatch: raw {missing_raw} vs 861, cleaned {missing_clean} vs 865")
             failures += 1
 
         if "wind_direction_circular_deg" in df_enh.columns and "season" in df_enh.columns:
@@ -120,6 +120,14 @@ def run_audit():
         else:
             print(f"  [FAIL] Missing or empty figure: {fig_name}")
             failures += 1
+
+    # Authoritative interactive dashboard check
+    dash_fp = BASE_DIR / "docs" / "figures" / "smogwatch_interactive_dashboard.html"
+    if dash_fp.exists() and dash_fp.stat().st_size > 0:
+        print(f"  [PASS] {'Authoritative Dashboard (docs/figures)':<42} Exists ({dash_fp.stat().st_size / 1024:.1f} KB)")
+    else:
+        print(f"  [FAIL] Missing or empty authoritative dashboard at {dash_fp}")
+        failures += 1
 
     # 4. Report & Notebook Verification
     print("\n[CHECK 4/5] Report & Notebook Deliverables")

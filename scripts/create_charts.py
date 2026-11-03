@@ -27,6 +27,8 @@ DATA_PATH = BASE_DIR / "data" / "processed" / "daily_air_quality_weather_enhance
 FALLBACK_DATA = BASE_DIR / "data" / "processed" / "daily_air_quality_weather_2022_2024.csv"
 FIGURES_DIR = BASE_DIR / "reports" / "figures"
 FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+DOCS_FIGURES_DIR = BASE_DIR / "docs" / "figures"
+DOCS_FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 # Visual Styling Tokens
 PALETTE = {
@@ -758,9 +760,9 @@ def chart_15_interactive_plotly(df: pd.DataFrame):
         margin=dict(l=60, r=40, t=110, b=60)
     )
 
-    html_path = FIGURES_DIR / "smogwatch_interactive_dashboard.html"
-    fig.write_html(str(html_path))
-    print(f"Saved interactive dashboard: {html_path}")
+    html_path = DOCS_FIGURES_DIR / "smogwatch_interactive_dashboard.html"
+    fig.write_html(str(html_path), include_plotlyjs="cdn")
+    print(f"Saved authoritative interactive dashboard (CDN): {html_path}")
 
     # Also save static overview for documentation inclusion
     static_png = FIGURES_DIR / "15_interactive_plotly_overview.png"
@@ -777,7 +779,7 @@ def chart_15_interactive_plotly(df: pd.DataFrame):
     ax.set_title("Interactive Dashboard Static Overview: All Cities Time Series (2022–2024)", fontweight="bold", pad=15)
     ax.legend(loc="upper right", ncol=3)
     ax.set_ylim(0, 1050)
-    add_takeaway(fig_static, "Interactive HTML dashboard available at reports/figures/smogwatch_interactive_dashboard.html.")
+    add_takeaway(fig_static, "Interactive HTML dashboard available at docs/figures/smogwatch_interactive_dashboard.html.")
     plt.tight_layout(rect=[0, 0.05, 1, 1])
     fig_static.savefig(static_png, dpi=300)
     plt.close(fig_static)
@@ -806,8 +808,17 @@ def main():
     chart_14_calendar_heatmap(df)
     chart_15_interactive_plotly(df)
 
+    import shutil
+    for png_file in FIGURES_DIR.glob("*.png"):
+        shutil.copy2(png_file, DOCS_FIGURES_DIR / png_file.name)
+    # Ensure redundant reports dashboard HTML is not present
+    stale_reports_dash = FIGURES_DIR / "smogwatch_interactive_dashboard.html"
+    if stale_reports_dash.exists():
+        stale_reports_dash.unlink()
+
     print("=" * 65)
-    print("ALL 15 CHARTS GENERATED SUCCESSFULLY IN:", FIGURES_DIR)
+    print("ALL 15 CHARTS GENERATED IN:", FIGURES_DIR)
+    print("AUTHORITATIVE DASHBOARD GENERATED IN:", DOCS_FIGURES_DIR)
     print("=" * 65)
 
 

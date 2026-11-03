@@ -494,7 +494,7 @@ python scripts/create_charts.py
 python scripts/create_hourly_charts.py
 ```
 
-All figures are populated in `reports/figures/` (Figures 01 through 18), and the interactive dashboard is generated at `reports/figures/smogwatch_interactive_dashboard.html`.
+All figures are populated in `reports/figures/` (Figures 01 through 19), and the authoritative interactive dashboard is published at `docs/figures/smogwatch_interactive_dashboard.html` (with CDN optimization).
 
 ---
 
